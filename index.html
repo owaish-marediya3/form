@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Support</title>
+    <style>
+        :root {
+            --one-ui-bg: #f4f4f4;
+            --card-bg: #ffffff;
+            --primary: #0381fe;
+            --input-bg: #f0f0f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--one-ui-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: 28px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            background-color: var(--input-bg);
+            border: none;
+            border-radius: 16px;
+            box-sizing: border-box;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            background-color: #e8e8e8;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Get in Touch</h1>
+        <form id="contactForm">
+            <div class="form-group"><input type="text" id="fullname" placeholder="Full Name" required></div>
+            <div class="form-group"><input type="email" id="email" placeholder="Email Address" required></div>
+            <div class="form-group"><input type="tel" id="phone" placeholder="Phone Number"></div>
+            <div class="form-group"><input type="text" id="subject" placeholder="Subject"></div>
+            <button type="submit" id="submitBtn">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('contactForm');
+        const btn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            btn.disabled = true;
+            btn.innerText = 'Sending...';
+
+            const data = {
+                fullname: document.getElementById('fullname').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                subject: document.getElementById('subject').value
+            };
+
+            try {
+                // Correct fetch syntax
+                const response = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Message Sent Successfully!');
+                    form.reset();
+                } else {
+                    const errData = await response.json();
+                    alert('Error: ' + (errData.error || 'Check server logs'));
+                }
+            } catch (error) {
+                alert('Connection Error. Make sure the server is running!');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Submit';
+            }
+        });
+    </script>
+</body>
+</html>

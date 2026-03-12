@@ -1,0 +1,8 @@
+{
+	"dependencies": {
+		"express": "^5.2.1",
+		"@supabase/supabase-js": "^2.99.1",
+		"cors": "^2.8.6",
+		"body-parser": "^2.2.2"
+	}
+}
