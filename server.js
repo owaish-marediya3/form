@@ -5,47 +5,69 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 const app = express();
-app.use(cors());
-app.use(bodyParser.json());
 
-// Serving index.html at the root for local testing
+// 1. Better CORS settings to allow local testing
+app.use(cors({
+    origin: '*', // Allows requests from any origin (ideal for development)
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type']
+}));
+
+app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
-const supabaseUrl = 'https://bajxgcoacycwmpxoqcwv.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJhanhnY29hY3ljd21weG9xY3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NTIyODIsImV4cCI6MjA4ODQyODI4Mn0.LRqikoZMKh7N0icbLWu0ZyECpa4FiBLYKoCJlXDQ4PM';
+// 2. Configuration
+const supabaseUrl = 'https://wtddbmwzgcarlxptzjnh.supabase.co';
+const supabaseKey = 'sb_publishable_35PMd2WhFECASfB0ekZCNg_72KhhRb9';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Route to serve HTML
+// 3. Route to serve the HTML frontend
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Match the /api/submit path from the frontend
+// 4. The submission endpoint
 app.post('/api/submit', async (req, res) => {
     const { fullname, email, phone, subject } = req.body;
 
-    const { data, error } = await supabase
-        .from('contacts')
-        .insert([{ 
-            full_name: fullname, 
-            email: email, 
-            phone: phone, 
-            subject: subject 
-        }]);
-
-    if (error) {
-        console.error("Supabase Error:", error.message);
-        return res.status(500).json({ error: error.message });
+    // Basic Validation
+    if (!fullname || !email) {
+        return res.status(400).json({ error: 'Full Name and Email are required' });
     }
 
-    res.status(200).json({ message: 'Success', data });
+    try {
+        // MATCHES SQL: Insert into 'fullname' column (no underscore)
+        const { data, error } = await supabase
+            .from('contacts')
+            .insert([
+                { 
+                    fullname: fullname, 
+                    email: email, 
+                    phone: phone || null, 
+                    subject: subject || 'No Subject' 
+                }
+            ])
+            .select();
+
+        if (error) {
+            console.error("Supabase Error:", error.message);
+            return res.status(500).json({ error: error.message });
+        }
+
+        console.log("Success! Data saved to Supabase:", data);
+        return res.status(200).json({ message: 'Success', data });
+
+    } catch (err) {
+        console.error("Server Error:", err.message);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
-// This is required for Vercel
+// Required for Vercel deployment
 module.exports = app;
 
-// Local testing port
-const PORT = 3000;
+// 5. Local server startup
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`🚀 Server running! View your form at: http://localhost:${PORT}`);
 });

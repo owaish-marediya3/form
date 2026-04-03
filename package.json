@@ -1,8 +1,27 @@
 {
 	"dependencies": {
-		"express": "^5.2.1",
-		"@supabase/supabase-js": "^2.99.1",
+		"@supabase/supabase-js": "^2.101.1",
+		"body-parser": "^2.2.2",
 		"cors": "^2.8.6",
-		"body-parser": "^2.2.2"
-	}
+		"express": "^5.2.1"
+	},
+	"name": "form",
+	"version": "1.0.0",
+	"description": "",
+	"main": "server.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node server.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/owaish-marediya3/form.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/owaish-marediya3/form/issues"
+	},
+	"homepage": "https://github.com/owaish-marediya3/form#readme"
 }
